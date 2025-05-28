@@ -7,11 +7,6 @@ import (
 	"strconv"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Server", "Go")
-	w.Write([]byte("Ayooo hellooo from server"))
-}
-
 func getSnippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
