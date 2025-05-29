@@ -1,6 +1,6 @@
-package ui
+package layout
 
-templ base() {
+templ Base(title string, main templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -12,13 +12,9 @@ templ base() {
 				<h1><a href="/">Snippetbox</a></h1>
 			</header>
 			<main>
-				{ main }
+				@main
 			</main>
 			<footer>Powered by <a href="https://golang.org/">Go</a></footer>
 		</body>
 	</html>
-}
-
-templ title() {
-	Home
 }
