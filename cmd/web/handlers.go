@@ -10,20 +10,17 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	
+
 	err := ui.Home().Render(r.Context(), w)
 	if err != nil {
-		app.logger.Error(err.Error(), "method", r.Method, "uri", r.URL.RequestURI())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+		app.serverError(w, r, err)
 	}
 }
 
 func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
-		http.NotFound(w, r)
-		return
+		app.serverError(w, r, err)
 	}
 
 	msg := fmt.Sprintf("Display a specific snippet with ID %d...", id)
