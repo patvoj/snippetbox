@@ -3,15 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"strconv"
 )
-
-type config struct {
-	addr      string
-	staticDir string
-}
 
 func getSnippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
@@ -34,15 +30,17 @@ func postSnippetCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var cfg config
-
-	flag.StringVar(&cfg.addr, "addr", ":4000", "HTTP network address")
-	flag.StringVar(&cfg.staticDir, "static-dir", "./ui/static", "Path to static assets")
+	addr := flag.String("addr", ":4000", "HTTP network address")
 	flag.Parse()
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelDebug,
+	}))
 
 	mux := http.NewServeMux()
 
-	fileServer := http.FileServer(http.Dir(cfg.staticDir))
+	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
 	mux.HandleFunc("GET /{$}", home)
@@ -50,8 +48,9 @@ func main() {
 	mux.HandleFunc("GET /snippet/create", getSnippetForm)
 	mux.HandleFunc("POST /snippet/create", postSnippetCreate)
 
-	log.Print("starting a server on ", cfg.addr)
+	logger.Info("starting a server", "addr", *addr)
 
-	err := http.ListenAndServe(cfg.addr, mux)
-	log.Fatal(err)
+	err := http.ListenAndServe(*addr, mux)
+	logger.Error(err.Error())
+	os.Exit(1)
 }
