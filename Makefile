@@ -1,5 +1,7 @@
 # Name of the binary
 BINARY_NAME=snippetbox
+BIN_DIR=bin
+BINARY_PATH=$(BIN_DIR)/$(BINARY_NAME)
 
 # Go entry point
 MAIN=cmd/web/main.go
@@ -13,20 +15,24 @@ generate:
 	templ generate
 
 # Build the Go binary
-build:
+build: | $(BIN_DIR)
 	@echo "🏗️  Building Go app..."
-	go build -o $(BINARY_NAME) ./cmd/web
+	go build -o $(BINARY_PATH) ./cmd/web
+
+# Ensure bin directory exists
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
 
 # Run the server
 run: build
 	@echo "🚀 Running server..."
-	./$(BINARY_NAME)
+	./$(BINARY_PATH)
 
 # Clean generated files and binary
 clean:
 	@echo "🧹 Cleaning up..."
 	go clean
-	rm -f $(BINARY_NAME)
+	rm -rf $(BIN_DIR)
 
 # Rebuild everything from scratch
 rebuild: clean all
