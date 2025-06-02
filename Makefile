@@ -36,3 +36,8 @@ clean:
 
 # Rebuild everything from scratch
 rebuild: clean all
+
+# Open psql inside the running DB container
+psql:
+	@echo "🐘 Connecting to PostgreSQL..."
+	docker exec -it snippetbox-db psql -U web -d snippetbox
