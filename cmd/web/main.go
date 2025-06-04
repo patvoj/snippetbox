@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/patvoj/snippetbox/internal/db/models"
+	"github.com/patvoj/snippetbox/internal/models"
 
 	_ "github.com/lib/pq"
 )

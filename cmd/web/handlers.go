@@ -1,20 +1,31 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
-	ui "github.com/patvoj/snippetbox/ui/html/pages"
+	"github.com/patvoj/snippetbox/internal/models"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err := ui.Home().Render(r.Context(), w)
+	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, r, err)
+		return
 	}
+
+	for _, snippet := range snippets {
+		fmt.Fprintf(w, "%+v\n", snippet)
+	}
+
+	// err := ui.Home().Render(r.Context(), w)
+	// if err != nil {
+	// 	app.serverError(w, r, err)
+	// }
 }
 
 func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
@@ -23,8 +34,19 @@ func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, r, err)
 	}
 
-	msg := fmt.Sprintf("Display a specific snippet with ID %d...", id)
-	w.Write([]byte(msg))
+	snippet, err := app.snippets.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			http.NotFound(w, r)
+		} else {
+			app.serverError(w, r, err)
+		}
+
+		return
+
+	}
+
+	fmt.Fprintf(w, "%+v", snippet)
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
