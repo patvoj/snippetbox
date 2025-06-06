@@ -1,12 +1,44 @@
 package layout
 
-import "github.com/patvoj/snippetbox/ui/html"
+import (
+	"fmt"
+	"github.com/patvoj/snippetbox/internal/types"
+	"github.com/patvoj/snippetbox/ui/html"
+)
 
-templ main() {
-	<h2>Latest Snippets</h2>
-	<p>There's nothing to see here yet!</p>
+templ Home(data types.TemplateData) {
+	@layout.Base("Home", MainContent(data))
 }
 
-templ Home() {
-	@layout.Base("Home", main())
+templ MainContent(data types.TemplateData) {
+	<h2>Latest Snippets</h2>
+	if data.Snippets != nil && len(data.Snippets) > 0 {
+		<div class="snippets-list">
+			<table>
+				<tr>
+					<th>Title</th>
+					<th>Created</th>
+					<th>ID</th>
+				</tr>
+				for _, snippet := range data.Snippets {
+					<tr>
+						<td>
+							<a href={ templ.URL(fmt.Sprintf("/snippet/view/%d", snippet.ID)) }>
+								{ snippet.Title }
+							</a>
+						</td>
+						<td>
+							<time>Created: { snippet.Created.Format("2 Jan 2006 at 15:04") }</time>
+						</td>
+						<td>
+							<span>#{ fmt.Sprintf("%d", snippet.ID) }</span>
+						</td>
+					</tr>
+				}
+			</table>
+		</div>
+	} else {
+		<p>There's nothing to see here yet!</p>
+		<p><a href="/snippet/create">Create the first snippet</a></p>
+	}
 }

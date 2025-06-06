@@ -1,0 +1,22 @@
+package layout
+
+import (
+	"fmt"
+	"github.com/patvoj/snippetbox/internal/types"
+)
+
+templ SnippetView(data types.TemplateData) {
+	if data.Snippet != nil {
+		<div class="snippet">
+			<div class="metadata">
+				<strong>{ data.Snippet.Title }</strong>
+				<span>#{ fmt.Sprintf("%d", data.Snippet.ID) }</span>
+			</div>
+			<pre><code>{ data.Snippet.Content }</code></pre>
+			<div class="metadata">
+				<time>Created: { data.Snippet.Created.Format("2006-01-02 15:04:05") }</time>
+				<time>Expires: { data.Snippet.Expires.Format("2006-01-02 15:04:05") }</time>
+			</div>
+		</div>
+	}
+}

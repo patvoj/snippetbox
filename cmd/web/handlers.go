@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/patvoj/snippetbox/internal/models"
+	"github.com/patvoj/snippetbox/internal/types"
+	ui "github.com/patvoj/snippetbox/ui/html"
+	pages "github.com/patvoj/snippetbox/ui/html/pages"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Add("Server", "Go")
 
 	snippets, err := app.snippets.Latest()
 	if err != nil {
@@ -18,14 +22,14 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, snippet := range snippets {
-		fmt.Fprintf(w, "%+v\n", snippet)
+	data := types.TemplateData{
+		Snippets: snippets,
 	}
 
-	// err := ui.Home().Render(r.Context(), w)
-	// if err != nil {
-	// 	app.serverError(w, r, err)
-	// }
+	err = pages.Home(data).Render(r.Context(), w)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
 }
 
 func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
@@ -43,10 +47,21 @@ func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
 		}
 
 		return
-
 	}
 
-	fmt.Fprintf(w, "%+v", snippet)
+	snippet.Content = strings.ReplaceAll(snippet.Content, "\\n", "\n")
+	title := "Snippet #" + strconv.Itoa(snippet.ID)
+
+	data := types.TemplateData{
+		Snippet: &snippet,
+	}
+
+	snippetViewComponent := pages.SnippetView(data)
+
+	err = ui.Base(title, snippetViewComponent).Render(r.Context(), w)
+	if err != nil {
+		app.serverError(w, r, err)
+	}
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
