@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/patvoj/snippetbox/internal/models"
-	"github.com/patvoj/snippetbox/internal/types"
 	ui "github.com/patvoj/snippetbox/ui/html"
 	pages "github.com/patvoj/snippetbox/ui/html/pages"
 )
@@ -22,14 +21,10 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := types.TemplateData{
-		Snippets: snippets,
-	}
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
 
-	err = pages.Home(data).Render(r.Context(), w)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
+	app.render(w, r, 200, pages.Home(data))
 }
 
 func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
@@ -52,16 +47,12 @@ func (app *application) getSnippetView(w http.ResponseWriter, r *http.Request) {
 	snippet.Content = strings.ReplaceAll(snippet.Content, "\\n", "\n")
 	title := "Snippet #" + strconv.Itoa(snippet.ID)
 
-	data := types.TemplateData{
-		Snippet: &snippet,
-	}
+	data := app.newTemplateData(r)
+	data.Snippet = &snippet
 
 	snippetViewComponent := pages.SnippetView(data)
 
-	err = ui.Base(title, snippetViewComponent).Render(r.Context(), w)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
+	app.render(w, r, 200, ui.Base(title, data.CurrentYear, snippetViewComponent))
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {

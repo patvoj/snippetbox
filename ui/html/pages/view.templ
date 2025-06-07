@@ -2,10 +2,11 @@ package layout
 
 import (
 	"fmt"
-	"github.com/patvoj/snippetbox/internal/types"
+
+	"github.com/patvoj/snippetbox/internal/utils"
 )
 
-templ SnippetView(data types.TemplateData) {
+templ SnippetView(data utils.TemplateData) {
 	if data.Snippet != nil {
 		<div class="snippet">
 			<div class="metadata">
@@ -14,8 +15,8 @@ templ SnippetView(data types.TemplateData) {
 			</div>
 			<pre><code>{ data.Snippet.Content }</code></pre>
 			<div class="metadata">
-				<time>Created: { data.Snippet.Created.Format("2006-01-02 15:04:05") }</time>
-				<time>Expires: { data.Snippet.Expires.Format("2006-01-02 15:04:05") }</time>
+				<time>Created: { utils.HumanDate(data.Snippet.Created) }</time>
+				<time>Expires: { utils.HumanDate(data.Snippet.Expires) }</time>
 			</div>
 		</div>
 	}

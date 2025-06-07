@@ -2,15 +2,15 @@ package layout
 
 import (
 	"fmt"
-	"github.com/patvoj/snippetbox/internal/types"
+	"github.com/patvoj/snippetbox/internal/utils"
 	"github.com/patvoj/snippetbox/ui/html"
 )
 
-templ Home(data types.TemplateData) {
-	@layout.Base("Home", MainContent(data))
+templ Home(data utils.TemplateData) {
+	@layout.Base("Home", data.CurrentYear, MainContent(data))
 }
 
-templ MainContent(data types.TemplateData) {
+templ MainContent(data utils.TemplateData) {
 	<h2>Latest Snippets</h2>
 	if data.Snippets != nil && len(data.Snippets) > 0 {
 		<div class="snippets-list">
@@ -28,7 +28,7 @@ templ MainContent(data types.TemplateData) {
 							</a>
 						</td>
 						<td>
-							<time>Created: { snippet.Created.Format("2 Jan 2006 at 15:04") }</time>
+							<time>{ utils.HumanDate(snippet.Created) }</time>
 						</td>
 						<td>
 							<span>#{ fmt.Sprintf("%d", snippet.ID) }</span>
